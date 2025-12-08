@@ -1,10 +1,13 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis-sentinel-proxy
   namespace: redis
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: redis-sentinel-proxy
   template:
     metadata:
       labels:
@@ -24,3 +27,12 @@ spec:
             value: "redis-sentinel.$(NAMESPACE):26379"
         ports:
         - containerPort: 9999
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          readOnlyRootFilesystem: true
+          runAsUser: 1001
+          runAsGroup: 1001
+          capabilities:
+            drop:
+            - ALL
